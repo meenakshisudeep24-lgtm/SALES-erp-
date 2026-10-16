@@ -1,0 +1,492 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Product Master{% endblock %}
+{% block page_heading %}Product Master{% endblock %}
+
+{% block content %}
+<style>
+    .pm-page {
+        min-height: 80vh;
+        padding: 25px;
+        border-radius: 16px;
+        background: #100d1c;
+        color: #f5f1ff;
+    }
+
+    .pm-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 18px;
+        margin-bottom: 25px;
+    }
+
+    .pm-title {
+        margin: 0 0 8px;
+        font-size: 27px;
+        font-weight: 700;
+        color: #ffffff;
+    }
+
+    .pm-subtitle {
+        margin: 0;
+        color: #b6aacd;
+        font-size: 14px;
+    }
+
+    .pm-add-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 13px 20px;
+        border-radius: 9px;
+        color: #fff !important;
+        background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+        text-decoration: none !important;
+        font-size: 14px;
+        font-weight: 700;
+        border: none;
+        transition: 0.2s;
+        box-shadow: 0 5px 15px rgba(109, 40, 217, .25);
+    }
+
+    .pm-add-btn:hover {
+        background: linear-gradient(135deg, #a78bfa, #7c3aed);
+        transform: translateY(-1px);
+    }
+
+    .pm-card {
+        padding: 23px;
+        margin-bottom: 22px;
+        border-radius: 15px;
+        background: linear-gradient(145deg, #211934, #191327);
+        border: 1px solid #3c2d59;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, .15);
+    }
+
+    .pm-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+        margin-bottom: 23px;
+    }
+
+    .pm-stat-card {
+        padding: 23px;
+        border-radius: 14px;
+        background: linear-gradient(145deg, #211934, #191327);
+        border: 1px solid #3c2d59;
+    }
+
+    .pm-stat-label {
+        color: #b6aacd;
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+
+    .pm-stat-value {
+        color: #c4b5fd;
+        font-size: 30px;
+        font-weight: 700;
+    }
+
+    .pm-stat-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        margin-bottom: 15px;
+        border-radius: 11px;
+        background: #34234f;
+        color: #c4b5fd;
+        font-size: 20px;
+    }
+
+    .pm-search-form {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .pm-search {
+        flex: 1;
+        min-width: 220px;
+        padding: 13px 15px;
+        background: #120e20;
+        color: #fff;
+        border: 1px solid #493765;
+        border-radius: 9px;
+        outline: none;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    .pm-search::placeholder {
+        color: #827494;
+    }
+
+    .pm-search:focus {
+        border-color: #a78bfa;
+        box-shadow: 0 0 0 3px rgba(167, 139, 250, .13);
+    }
+
+    .pm-btn {
+        padding: 13px 20px;
+        border: none;
+        border-radius: 9px;
+        background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: .2s;
+    }
+
+    .pm-btn:hover {
+        background: linear-gradient(135deg, #a78bfa, #7c3aed);
+    }
+
+    .pm-clear-btn {
+        padding: 12px 17px;
+        border: 1px solid #493765;
+        border-radius: 9px;
+        background: #2b203d;
+        color: #ded4f4 !important;
+        text-decoration: none !important;
+        font-size: 14px;
+    }
+
+    .pm-clear-btn:hover {
+        background: #3a2a50;
+    }
+
+    .pm-table-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+
+    .pm-table-heading h3 {
+        margin: 0;
+        color: #ffffff;
+        font-size: 18px;
+    }
+
+    .pm-count {
+        color: #c4b5fd;
+        font-size: 13px;
+    }
+
+    .pm-table-wrapper {
+        overflow-x: auto;
+        border: 1px solid #3c2d59;
+        border-radius: 10px;
+    }
+
+    .pm-table {
+        width: 100%;
+        min-width: 760px;
+        border-collapse: collapse;
+        background: #191327;
+    }
+
+    .pm-table thead {
+        background: #2b203d;
+    }
+
+    .pm-table th {
+        padding: 16px 18px;
+        color: #c4b5fd;
+        font-size: 12px;
+        font-weight: 700;
+        text-align: left;
+        text-transform: uppercase;
+        letter-spacing: .7px;
+        white-space: nowrap;
+        border-bottom: 1px solid #493765;
+    }
+
+    .pm-table td {
+        padding: 17px 18px;
+        color: #e4dcef;
+        font-size: 14px;
+        border-bottom: 1px solid #302441;
+    }
+
+    .pm-table tbody tr {
+        transition: background .2s;
+    }
+
+    .pm-table tbody tr:hover {
+        background: #251b37;
+    }
+
+    .pm-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .pm-code {
+        color: #c4b5fd !important;
+        font-weight: 700;
+    }
+
+    .pm-product-name {
+        color: #ffffff !important;
+        font-weight: 600;
+    }
+
+    .pm-price {
+        color: #ddd6fe !important;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .pm-category {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 6px;
+        background: #302441;
+        color: #d8c8f3;
+        font-size: 12px;
+    }
+
+    .pm-status {
+        display: inline-block;
+        padding: 6px 11px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .pm-status-active {
+        color: #86efac;
+        background: rgba(34, 197, 94, .12);
+        border: 1px solid rgba(34, 197, 94, .25);
+    }
+
+    .pm-status-inactive {
+        color: #fca5a5;
+        background: rgba(239, 68, 68, .12);
+        border: 1px solid rgba(239, 68, 68, .25);
+    }
+
+    .pm-empty {
+        padding: 45px 20px !important;
+        text-align: center;
+        color: #b6aacd !important;
+    }
+
+    .pm-empty-icon {
+        display: block;
+        font-size: 32px;
+        margin-bottom: 12px;
+    }
+
+    .pm-message {
+        padding: 13px 16px;
+        margin-bottom: 18px;
+        border: 1px solid #62458a;
+        border-radius: 9px;
+        background: #2b203d;
+        color: #e9ddff;
+    }
+
+    @media (max-width: 700px) {
+        .pm-page {
+            padding: 14px;
+        }
+
+        .pm-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .pm-card {
+            padding: 16px;
+        }
+
+        .pm-header {
+            align-items: flex-start;
+        }
+
+        .pm-add-btn {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .pm-search-form {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .pm-search {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .pm-btn,
+        .pm-clear-btn {
+            text-align: center;
+        }
+    }
+</style>
+
+<div class="pm-page">
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="pm-message">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Page Heading -->
+    <div class="pm-header">
+        <div>
+            <h2 class="pm-title">Product Master</h2>
+            <p class="pm-subtitle">
+                Manage your products, pricing and inventory in one place.
+            </p>
+        </div>
+
+        <a href="{% url 'product_create' %}" class="pm-add-btn">
+            <span>＋</span> Add Product
+        </a>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="pm-stats">
+        <div class="pm-stat-card">
+            <div class="pm-stat-icon">▦</div>
+            <div class="pm-stat-label">Total Products</div>
+            <div class="pm-stat-value">{{ total_products|default:0 }}</div>
+        </div>
+
+        <div class="pm-stat-card">
+            <div class="pm-stat-icon">⌕</div>
+            <div class="pm-stat-label">Matching Products</div>
+            <div class="pm-stat-value">{{ products|length }}</div>
+        </div>
+
+        <div class="pm-stat-card">
+            <div class="pm-stat-icon">◈</div>
+            <div class="pm-stat-label">Inventory Management</div>
+            <div class="pm-stat-value" style="font-size: 20px;">
+                Product List
+            </div>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="pm-card">
+        <form method="GET" class="pm-search-form">
+            <input
+                type="text"
+                class="pm-search"
+                name="search"
+                value="{{ search }}"
+                placeholder="Search by product code, name or category..."
+            >
+
+            <button type="submit" class="pm-btn">
+                Search Products
+            </button>
+
+            <a href="{% url 'product_master' %}" class="pm-clear-btn">
+                Clear
+            </a>
+        </form>
+    </div>
+
+    <!-- Product Table -->
+    <div class="pm-card">
+        <div class="pm-table-heading">
+            <h3>Inventory Products</h3>
+            <span class="pm-count">
+                {{ products|length }} product(s) displayed
+            </span>
+        </div>
+
+        <div class="pm-table-wrapper">
+            <table class="pm-table">
+                <thead>
+                    <tr>
+                        <th>Product Code</th>
+                        <th>Product Name</th>
+                        <th>Category</th>
+                        <th>Unit Price</th>
+                        <th>Stock Quantity</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td class="pm-code">
+                            {{ product.product_code }}
+                        </td>
+
+                        <td class="pm-product-name">
+                            {{ product.product_name }}
+                        </td>
+
+                        <td>
+                            <span class="pm-category">
+                                {{ product.category|default:"Uncategorized" }}
+                            </span>
+                        </td>
+
+                        <td class="pm-price">
+                            ₹ {{ product.unit_price|floatformat:2 }}
+                        </td>
+
+                        <td>
+                            {{ product.stock_quantity }}
+                        </td>
+
+                        <td>
+                            {% if product.status == 'Active' %}
+                                <span class="pm-status pm-status-active">
+                                    ● Active
+                                </span>
+                            {% else %}
+                                <span class="pm-status pm-status-inactive">
+                                    ● {{ product.status }}
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="pm-empty">
+                            <span class="pm-empty-icon">▦</span>
+                            <strong>No products found</strong>
+                            <p>
+                                Add your first product or try a different search.
+                            </p>
+
+                            <a
+                                href="{% url 'product_create' %}"
+                                class="pm-add-btn"
+                            >
+                                ＋ Add Product
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

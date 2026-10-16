@@ -1,0 +1,602 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Customer Master | SalesERP{% endblock %}
+{% block page_heading %}Customer Master Directory{% endblock %}
+
+{% block extra_head %}
+<style>
+    .cm-page {
+        color: #f5f3ff;
+    }
+
+    .cm-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .cm-heading {
+        font-size: 23px;
+        font-weight: 750;
+        margin-bottom: 7px;
+    }
+
+    .cm-subtitle {
+        color: #b7accf;
+        font-size: 13px;
+    }
+
+    .cm-button {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 16px;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .cm-button:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.1);
+    }
+
+    .cm-button-primary {
+        color: white;
+        background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+    }
+
+    .cm-button-secondary {
+        color: #e9d5ff;
+        background: #211934;
+        border-color: #493765;
+    }
+
+    .cm-back {
+        margin-bottom: 22px;
+    }
+
+    .cm-back a {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 12px 18px;
+        border: 1px solid #a78bfa;
+        border-radius: 10px;
+        color: white;
+        background: #6d28d9;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .cm-back a:hover {
+        background: #8b5cf6;
+    }
+
+    .cm-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .cm-stat-card {
+        padding: 20px;
+        border: 1px solid #3c2d59;
+        border-radius: 14px;
+        background: #211934;
+    }
+
+    .cm-stat-label {
+        color: #b7accf;
+        font-size: 12px;
+        margin-bottom: 12px;
+    }
+
+    .cm-stat-value {
+        font-size: 28px;
+        font-weight: 800;
+        overflow-wrap: anywhere;
+    }
+
+    .cm-stat-note {
+        color: #a78bfa;
+        font-size: 11px;
+        margin-top: 8px;
+    }
+
+    .cm-card {
+        margin-bottom: 22px;
+        overflow: hidden;
+        border: 1px solid #3c2d59;
+        border-radius: 15px;
+        background: #191327;
+    }
+
+    .cm-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 19px 22px;
+        border-bottom: 1px solid #3c2d59;
+    }
+
+    .cm-card-title {
+        font-size: 16px;
+        font-weight: 750;
+    }
+
+    .cm-card-description {
+        margin-top: 5px;
+        color: #b7accf;
+        font-size: 12px;
+    }
+
+    .cm-filter-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 18px 22px;
+    }
+
+    .cm-input,
+    .cm-select {
+        min-width: 0;
+        padding: 11px 13px;
+        border: 1px solid #493765;
+        border-radius: 9px;
+        outline: none;
+        color: #f5f3ff;
+        background: #100d1c;
+        font-size: 13px;
+    }
+
+    .cm-search {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .cm-select {
+        min-width: 150px;
+    }
+
+    .cm-input:focus,
+    .cm-select:focus {
+        border-color: #a78bfa;
+        box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.15);
+    }
+
+    .cm-select option {
+        background: #191327;
+        color: white;
+    }
+
+    .cm-table-wrap {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .cm-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    .cm-table th {
+        padding: 14px 18px;
+        color: #b7accf;
+        background: #211934;
+        font-size: 11px;
+        font-weight: 750;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+    }
+
+    .cm-table td {
+        padding: 16px 18px;
+        border-top: 1px solid #302341;
+        font-size: 13px;
+        vertical-align: middle;
+    }
+
+    .cm-table tbody tr:hover {
+        background: #211934;
+    }
+
+    .cm-code {
+        color: #c4b5fd;
+        font-weight: 750;
+    }
+
+    .cm-customer-name {
+        color: #f5f3ff;
+        font-weight: 700;
+    }
+
+    .cm-email {
+        color: #b7accf;
+    }
+
+    .cm-amount {
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .cm-status {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 750;
+    }
+
+    .cm-status-active {
+        color: #bbf7d0;
+        background: #14532d;
+    }
+
+    .cm-status-inactive {
+        color: #fecdd3;
+        background: #4c1d35;
+    }
+
+    .cm-status-other {
+        color: #ddd6fe;
+        background: #352452;
+    }
+
+    .cm-action-link {
+        display: inline-block;
+        margin-right: 10px;
+        color: #c4b5fd;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .cm-action-link:hover {
+        color: white;
+        text-decoration: underline;
+    }
+
+    .cm-empty {
+        padding: 42px 20px !important;
+        color: #b7accf;
+        text-align: center;
+        white-space: normal;
+    }
+
+    .cm-empty strong {
+        display: block;
+        margin-bottom: 8px;
+        color: #f5f3ff;
+        font-size: 16px;
+    }
+
+    .cm-table-footer {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 15px 22px;
+        border-top: 1px solid #3c2d59;
+        color: #b7accf;
+        font-size: 12px;
+    }
+
+    @media (max-width: 800px) {
+        .cm-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .cm-stat-card:last-child {
+            grid-column: 1 / -1;
+        }
+    }
+
+    @media (max-width: 500px) {
+        .cm-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .cm-stat-card:last-child {
+            grid-column: auto;
+        }
+
+        .cm-filter-row {
+            padding: 14px;
+        }
+
+        .cm-search,
+        .cm-select {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .cm-card-header {
+            padding: 16px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cm-page">
+
+    <!-- Back to Dashboard -->
+    <div class="cm-back">
+        <a href="{% url 'dashboard' %}">
+            <span>←</span>
+            <span>Back to Dashboard</span>
+        </a>
+    </div>
+
+    <!-- Page heading and action -->
+    <div class="cm-header">
+        <div>
+            <h2 class="cm-heading">Customer Directory</h2>
+            <p class="cm-subtitle">
+                Manage customer records, tax details, credit limits and account status.
+            </p>
+        </div>
+
+        <a href="{% url 'customer_create' %}"
+           class="cm-button cm-button-primary">
+            <span>＋</span>
+            <span>Add Customer</span>
+        </a>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="cm-stats">
+
+        <div class="cm-stat-card">
+            <div class="cm-stat-label">Total Customers</div>
+            <div class="cm-stat-value">{{ customers|length }}</div>
+            <div class="cm-stat-note">Customer records displayed</div>
+        </div>
+
+        <div class="cm-stat-card">
+            <div class="cm-stat-label">Active Customers</div>
+            <div class="cm-stat-value" id="cm-active-count">—</div>
+            <div class="cm-stat-note">Based on the current table</div>
+        </div>
+
+        <div class="cm-stat-card">
+            <div class="cm-stat-label">Inactive Customers</div>
+            <div class="cm-stat-value" id="cm-inactive-count">—</div>
+            <div class="cm-stat-note">Based on the current table</div>
+        </div>
+
+    </div>
+
+    <!-- Customer table -->
+    <section class="cm-card">
+
+        <div class="cm-card-header">
+            <div>
+                <h3 class="cm-card-title">All Customers</h3>
+                <p class="cm-card-description">
+                    Search and filter your customer master records.
+                </p>
+            </div>
+
+            <span class="cm-status cm-status-other">
+                Customer Master
+            </span>
+        </div>
+
+        <!-- Search and filters -->
+        <div class="cm-filter-row">
+
+            <input
+                type="search"
+                id="cm-search"
+                class="cm-input cm-search"
+                placeholder="Search code, name, email or tax ID..."
+                aria-label="Search customers">
+
+            <select id="cm-status-filter"
+                    class="cm-select"
+                    aria-label="Filter by status">
+                <option value="">All statuses</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select>
+
+            <button type="button"
+                    class="cm-button cm-button-secondary"
+                    id="cm-reset">
+                Reset
+            </button>
+
+        </div>
+
+        <div class="cm-table-wrap">
+            <table class="cm-table" id="cm-customer-table">
+
+                <thead>
+                    <tr>
+                        <th>Customer Code</th>
+                        <th>Customer Name</th>
+                        <th>Email</th>
+                        <th>Tax ID</th>
+                        <th>Credit Limit</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for customer in customers %}
+                    <tr class="cm-customer-row">
+
+                        <td>
+                            <span class="cm-code">
+                                {{ customer.customer_code }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="cm-customer-name">
+                                {{ customer.customer_name }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="cm-email">
+                                {{ customer.email|default:"—" }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ customer.tax_id|default:"—" }}
+                        </td>
+
+                        <td>
+                            <span class="cm-amount">
+                                {{ customer.credit_limit|default_if_none:0|floatformat:2 }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {% if customer.status|lower == "active" %}
+                                <span class="cm-status cm-status-active">
+                                    {{ customer.status }}
+                                </span>
+                            {% elif customer.status|lower == "inactive" %}
+                                <span class="cm-status cm-status-inactive">
+                                    {{ customer.status }}
+                                </span>
+                            {% else %}
+                                <span class="cm-status cm-status-other">
+                                    {{ customer.status|default:"Unknown" }}
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <a
+                                href="{% url 'customer_detail' customer.id %}"
+                                class="cm-action-link">
+                                View
+                            </a>
+
+                            <a
+                                href="{% url 'customer_edit' customer.id %}"
+                                class="cm-action-link">
+                                Edit
+                            </a>
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="cm-empty">
+                            <strong>No customers found</strong>
+                            Your customer directory is currently empty.
+                            Use the Add Customer button to create your first record.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+        <div class="cm-table-footer">
+            <span id="cm-visible-count">
+                Showing {{ customers|length }} customer(s)
+            </span>
+
+            <span>
+                SalesERP · Customer Management
+            </span>
+        </div>
+
+    </section>
+
+</div>
+
+<script>
+(function () {
+    const searchInput = document.getElementById("cm-search");
+    const statusFilter = document.getElementById("cm-status-filter");
+    const resetButton = document.getElementById("cm-reset");
+    const rows = Array.from(
+        document.querySelectorAll("#cm-customer-table tbody tr.cm-customer-row")
+    );
+
+    const activeCount = document.getElementById("cm-active-count");
+    const inactiveCount = document.getElementById("cm-inactive-count");
+    const visibleCount = document.getElementById("cm-visible-count");
+
+    let activeTotal = 0;
+    let inactiveTotal = 0;
+
+    rows.forEach(function (row) {
+        const statusCell = row.cells[5];
+        const status = statusCell ? statusCell.textContent.trim().toLowerCase() : "";
+
+        if (status === "active") {
+            activeTotal++;
+        } else if (status === "inactive") {
+            inactiveTotal++;
+        }
+    });
+
+    activeCount.textContent = activeTotal;
+    inactiveCount.textContent = inactiveTotal;
+
+    function filterCustomers() {
+        const searchTerm = searchInput.value.trim().toLowerCase();
+        const selectedStatus = statusFilter.value.toLowerCase();
+        let visible = 0;
+
+        rows.forEach(function (row) {
+            const rowText = row.textContent.toLowerCase();
+            const statusCell = row.cells[5];
+            const rowStatus = statusCell
+                ? statusCell.textContent.trim().toLowerCase()
+                : "";
+
+            const matchesSearch = rowText.includes(searchTerm);
+            const matchesStatus = !selectedStatus || rowStatus === selectedStatus;
+            const showRow = matchesSearch && matchesStatus;
+
+            row.style.display = showRow ? "" : "none";
+
+            if (showRow) {
+                visible++;
+            }
+        });
+
+        visibleCount.textContent =
+            "Showing " + visible + " of " + rows.length + " customer(s)";
+    }
+
+    searchInput.addEventListener("input", filterCustomers);
+    statusFilter.addEventListener("change", filterCustomers);
+
+    resetButton.addEventListener("click", function () {
+        searchInput.value = "";
+        statusFilter.value = "";
+        filterCustomers();
+    });
+
+    filterCustomers();
+})();
+</script>
+{% endblock %}

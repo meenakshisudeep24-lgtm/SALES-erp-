@@ -1,0 +1,94 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Sales Invoices{% endblock %}
+{% block page_heading %}Sales Invoices{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="rounded-xl bg-purple-900/40 p-4 text-purple-200">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <h2 class="text-2xl font-bold text-white">
+                Sales Invoices
+            </h2>
+            <p class="mt-1 text-gray-400">
+                Manage and view your customer invoices.
+            </p>
+        </div>
+
+        <a href="{% url 'sales_invoice_create' %}"
+           class="rounded-xl bg-purple-600 px-5 py-3
+                  font-semibold text-white hover:bg-purple-700">
+            + Create Invoice
+        </a>
+    </div>
+
+    <div class="rounded-2xl border border-slate-700 bg-slate-900 p-5">
+        <p class="text-sm text-gray-400">Total Invoices</p>
+        <p class="mt-2 text-3xl font-bold text-white">
+            {{ invoices|length }}
+        </p>
+    </div>
+
+    <div class="overflow-x-auto rounded-2xl border border-slate-700
+                bg-slate-900">
+        <table class="w-full text-left text-sm text-gray-300">
+            <thead class="bg-slate-800 text-gray-200">
+                <tr>
+                    <th class="px-5 py-4">Invoice Number</th>
+                    <th class="px-5 py-4">Customer</th>
+                    <th class="px-5 py-4">Date</th>
+                    <th class="px-5 py-4">Total</th>
+                    <th class="px-5 py-4">Status</th>
+                    <th class="px-5 py-4">Action</th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y divide-slate-800">
+                {% for invoice in invoices %}
+                <tr class="hover:bg-slate-800">
+                    <td class="px-5 py-4 font-semibold text-purple-300">
+                        {{ invoice.invoice_number }}
+                    </td>
+                    <td class="px-5 py-4">
+                        {{ invoice.customer.customer_name }}
+                    </td>
+                    <td class="px-5 py-4">
+                        {{ invoice.invoice_date|date:"d M Y" }}
+                    </td>
+                    <td class="px-5 py-4 font-semibold text-white">
+                        ₹{{ invoice.grand_total|floatformat:2 }}
+                    </td>
+                    <td class="px-5 py-4">
+                        {{ invoice.status }}
+                    </td>
+                    <td class="px-5 py-4">
+                        <a href="{% url 'sales_invoice_detail' invoice.id %}"
+                           class="text-purple-300 hover:text-purple-200">
+                            View
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6"
+                        class="px-5 py-10 text-center text-gray-400">
+                        No invoices found. Create your first invoice.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}

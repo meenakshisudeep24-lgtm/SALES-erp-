@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if product %}Edit Product{% else %}Add Product{% endif %} | SalesERP Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-white min-h-screen">
+    <div class="max-w-3xl mx-auto px-6 py-10">
+
+        <a href="{% url 'product_master' %}" class="text-sky-400 hover:text-sky-300">
+            &larr; Back to Product Master
+        </a>
+
+        <div class="mt-6 bg-slate-900 border border-slate-700 rounded-2xl p-8">
+            <h1 class="text-2xl font-bold mb-2">
+                {% if product %}Edit Product{% else %}Add New Product{% endif %}
+            </h1>
+            <p class="text-slate-400 mb-8">Enter the product information below.</p>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <p class="mb-4 text-rose-400">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" class="space-y-5">
+                {% csrf_token %}
+
+                <div>
+                    <label for="product_code" class="block mb-2 text-sm">Product Code *</label>
+                    <input id="product_code" name="product_code" required
+                           value="{{ product.product_code|default:'' }}"
+                           class="w-full rounded-lg bg-slate-800 border border-slate-600 p-3 text-white">
+                </div>
+
+                <div>
+                    <label for="product_name" class="block mb-2 text-sm">Product Name *</label>
+                    <input id="product_name" name="product_name" required
+                           value="{{ product.product_name|default:'' }}"
+                           class="w-full rounded-lg bg-slate-800 border border-slate-600 p-3 text-white">
+                </div>
+
+                <div>
+                    <label for="category" class="block mb-2 text-sm">Category</label>
+                    <input id="category" name="category"
+                           value="{{ product.category|default:'' }}"
+                           class="w-full rounded-lg bg-slate-800 border border-slate-600 p-3 text-white">
+                </div>
+
+                <div>
+                    <label for="unit_price" class="block mb-2 text-sm">Unit Price *</label>
+                    <input id="unit_price" name="unit_price" type="number"
+                           min="0" step="0.01" required
+                           value="{{ product.unit_price|default:'0.00' }}"
+                           class="w-full rounded-lg bg-slate-800 border border-slate-600 p-3 text-white">
+                </div>
+
+                <div>
+                    <label for="stock_quantity" class="block mb-2 text-sm">Stock Quantity *</label>
+                    <input id="stock_quantity" name="stock_quantity" type="number"
+                           min="0" step="1" required
+                           value="{{ product.stock_quantity|default:'0' }}"
+                           class="w-full rounded-lg bg-slate-800 border border-slate-600 p-3 text-white">
+                </div>
+
+                <div>
+                    <label for="status" class="block mb-2 text-sm">Status</label>
+                    <select id="status" name="status"
+                            class="w-full rounded-lg bg-slate-800 border border-slate-600 p-3 text-white">
+                        <option value="Active" {% if product.status == 'Active' %}selected{% endif %}>Active</option>
+                        <option value="Inactive" {% if product.status == 'Inactive' %}selected{% endif %}>Inactive</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="submit"
+                            class="rounded-lg bg-sky-500 hover:bg-sky-400 px-6 py-3 font-semibold text-slate-950">
+                        {% if product %}Save Changes{% else %}Add Product{% endif %}
+                    </button>
+
+                    <a href="{% url 'product_master' %}"
+                       class="rounded-lg bg-slate-700 hover:bg-slate-600 px-6 py-3">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

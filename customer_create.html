@@ -1,0 +1,173 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Add Customer | SalesERP{% endblock %}
+{% block page_heading %}Add Customer{% endblock %}
+
+{% block extra_head %}
+<style>
+    .customer-card {
+        background: #0f172a;
+        border: 1px solid #1e293b;
+        border-radius: 16px;
+    }
+
+    .customer-input {
+        width: 100%;
+        padding: 12px 14px;
+        background: #020617;
+        border: 1px solid #334155;
+        border-radius: 9px;
+        color: #f8fafc;
+        outline: none;
+        box-sizing: border-box;
+    }
+
+    .customer-input:focus {
+        border-color: #a78bfa;
+    }
+
+    .customer-label {
+        display: block;
+        color: #cbd5e1;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .customer-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 18px;
+        border-radius: 9px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        text-decoration: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-6">
+
+    <div>
+        <h2 class="text-2xl font-bold text-white">
+            Add New Customer
+        </h2>
+        <p class="text-sm text-slate-400 mt-2">
+            Enter the customer details to create a new record.
+        </p>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="p-4 rounded-lg bg-slate-800 border border-slate-700 text-white">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="customer-card p-6 sm:p-8">
+
+        <form method="POST" action="{% url 'customer_create' %}">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+                <div>
+                    <label for="customer_code" class="customer-label">
+                        Customer Code *
+                    </label>
+                    <input
+                        type="text"
+                        id="customer_code"
+                        name="customer_code"
+                        maxlength="20"
+                        value="{{ request.POST.customer_code|default:'' }}"
+                        class="customer-input"
+                        placeholder="e.g. CUST-1001"
+                        required>
+                </div>
+
+                <div>
+                    <label for="customer_name" class="customer-label">
+                        Customer Name *
+                    </label>
+                    <input
+                        type="text"
+                        id="customer_name"
+                        name="customer_name"
+                        maxlength="200"
+                        value="{{ request.POST.customer_name|default:'' }}"
+                        class="customer-input"
+                        placeholder="Enter customer name"
+                        required>
+                </div>
+
+                <div>
+                    <label for="email" class="customer-label">
+                        Email Address
+                    </label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value="{{ request.POST.email|default:'' }}"
+                        class="customer-input"
+                        placeholder="customer@example.com">
+                </div>
+
+                <div>
+                    <label for="tax_id" class="customer-label">
+                        Tax ID
+                    </label>
+                    <input
+                        type="text"
+                        id="tax_id"
+                        name="tax_id"
+                        maxlength="50"
+                        value="{{ request.POST.tax_id|default:'' }}"
+                        class="customer-input"
+                        placeholder="Enter tax ID">
+                </div>
+
+                <div>
+                    <label for="credit_limit" class="customer-label">
+                        Credit Limit
+                    </label>
+                    <input
+                        type="number"
+                        id="credit_limit"
+                        name="credit_limit"
+                        min="0"
+                        max="9999999999.99"
+                        step="0.01"
+                        value="{{ request.POST.credit_limit|default:'0' }}"
+                        class="customer-input"
+                        placeholder="0.00">
+                </div>
+
+            </div>
+
+            <div class="flex flex-wrap gap-3 mt-8">
+
+                <button type="submit"
+                        class="customer-btn bg-purple-600 hover:bg-purple-700 text-white">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Save Customer
+                </button>
+
+                <a href="{% url 'customer_master' %}"
+                   class="customer-btn border border-slate-600 text-slate-200 hover:bg-slate-800">
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+{% endblock %}

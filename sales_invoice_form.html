@@ -1,0 +1,635 @@
+
+{% extends "base.html" %}
+
+{% block title %}Create Sales Invoice{% endblock %}
+
+{% block content %}
+
+<div class="mx-auto max-w-7xl space-y-6 text-white">
+
+    <!-- Page Header -->
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight">
+                Create Sales Invoice
+            </h1>
+            <p class="mt-2 text-sm text-slate-400">
+                Create an invoice with products, discounts and tax calculations.
+            </p>
+        </div>
+
+        <a href="{% url 'sales_invoice' %}"
+           class="inline-flex items-center justify-center rounded-xl border border-slate-700 bg-slate-900 px-5 py-3 font-semibold text-white hover:bg-slate-800">
+            <i class="fa-solid fa-arrow-left mr-2"></i>
+            Back to Invoices
+        </a>
+    </div>
+
+    <!-- Invoice Form -->
+    <form method="POST"
+          action="{% url 'sales_invoice_create' %}"
+          id="invoiceForm"
+          class="space-y-6">
+
+        {% csrf_token %}
+
+        <!-- Invoice Information -->
+        <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-lg">
+
+            <h2 class="mb-6 text-xl font-bold">
+                <i class="fa-solid fa-file-invoice mr-2 text-sky-400"></i>
+                Invoice Information
+            </h2>
+
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+
+                <!-- Customer -->
+                <div>
+                    <label for="customer_id"
+                           class="mb-2 block font-semibold text-slate-200">
+                        Customer <span class="text-red-400">*</span>
+                    </label>
+
+                    <select
+                        id="customer_id"
+                        name="customer_id"
+                        required
+                        class="block min-h-12 w-full rounded-xl border border-slate-600 bg-slate-950 px-4 py-3 text-white focus:border-sky-400 focus:outline-none">
+
+                        <option value="">Select Customer</option>
+
+                        {% for customer in customers %}
+                            <option value="{{ customer.id }}">
+                                {{ customer.customer_code }} - {{ customer.customer_name }}
+                            </option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+                <!-- Invoice Date -->
+                <div>
+                    <label for="invoice_date"
+                           class="mb-2 block font-semibold text-slate-200">
+                        Invoice Date <span class="text-red-400">*</span>
+                    </label>
+
+                    <input
+                        type="date"
+                        id="invoice_date"
+                        name="invoice_date"
+                        value="{{ today|date:'Y-m-d' }}"
+                        required
+                        class="block min-h-12 w-full rounded-xl border border-slate-600 bg-slate-950 px-4 py-3 text-white scheme-dark focus:border-sky-400 focus:outline-none">
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Product Details -->
+        <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-lg">
+
+            <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <h2 class="text-xl font-bold">
+                    <i class="fa-solid fa-boxes-stacked mr-2 text-sky-400"></i>
+                    Product Details
+                </h2>
+
+                <button
+                    type="button"
+                    id="addProductBtn"
+                    class="rounded-xl bg-sky-500 px-4 py-3 font-semibold text-white transition hover:bg-sky-600">
+
+                    <i class="fa-solid fa-plus mr-2"></i>
+                    Add Product
+                </button>
+            </div>
+
+            <div id="productRows" class="space-y-4">
+
+                <!-- Initial Product Row -->
+                <div class="product-row rounded-xl border border-slate-700 bg-slate-950 p-4">
+
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12">
+
+                        <!-- Product -->
+                        <div class="lg:col-span-5">
+                            <label class="mb-2 block text-sm font-medium text-slate-300">
+                                Product <span class="text-red-400">*</span>
+                            </label>
+
+                            <select
+                                name="product_id"
+                                class="product-select block min-h-12 w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-3 text-white focus:border-sky-400 focus:outline-none"
+                                required>
+
+                                <option value="">Select Product</option>
+
+                                {% for product in products %}
+                                    {% if product.status == "Active" %}
+                                        <option
+                                            value="{{ product.id }}"
+                                            data-price="{{ product.unit_price }}">
+                                            {{ product.product_code }} - {{ product.product_name }}
+                                        </option>
+                                    {% endif %}
+                                {% endfor %}
+
+                            </select>
+                        </div>
+
+                        <!-- Quantity -->
+                        <div class="lg:col-span-2">
+                            <label class="mb-2 block text-sm font-medium text-slate-300">
+                                Quantity
+                            </label>
+
+                            <input
+                                type="number"
+                                name="quantity"
+                                class="quantity-input block min-h-12 w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-3 text-white focus:border-sky-400 focus:outline-none"
+                                min="1"
+                                step="1"
+                                value="1"
+                                required>
+                        </div>
+
+                        <!-- Unit Price -->
+                        <div class="lg:col-span-2">
+                            <label class="mb-2 block text-sm font-medium text-slate-300">
+                                Unit Price (₹)
+                            </label>
+
+                            <input
+                                type="text"
+                                class="unit-price block min-h-12 w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-3 text-slate-300"
+                                value="0.00"
+                                readonly>
+                        </div>
+
+                        <!-- Line Total -->
+                        <div class="lg:col-span-2">
+                            <label class="mb-2 block text-sm font-medium text-slate-300">
+                                Line Total (₹)
+                            </label>
+
+                            <input
+                                type="text"
+                                class="line-total block min-h-12 w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-3 font-semibold text-sky-400"
+                                value="0.00"
+                                readonly>
+                        </div>
+
+                        <!-- Remove -->
+                        <div class="flex items-end lg:col-span-1">
+                            <button
+                                type="button"
+                                class="remove-product flex min-h-12 w-full items-center justify-center rounded-xl border border-red-500/30 bg-red-500/10 px-3 text-red-400 hover:bg-red-500/20"
+                                title="Remove product"
+                                aria-label="Remove product">
+
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <p class="mt-4 text-sm text-slate-400">
+                Select a product and enter its quantity. The line total updates automatically.
+            </p>
+
+        </div>
+
+        <!-- Calculation Section -->
+        <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-lg">
+
+            <h2 class="mb-6 text-xl font-bold">
+                <i class="fa-solid fa-calculator mr-2 text-sky-400"></i>
+                Invoice Calculation
+            </h2>
+
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+
+                <!-- Discount and Tax Inputs -->
+                <div class="space-y-5">
+
+                    <!-- Discount -->
+                    <div>
+                        <label for="discount_rate"
+                               class="mb-2 block font-semibold text-slate-200">
+                            Discount (%)
+                        </label>
+
+                        <input
+                            type="number"
+                            id="discount_rate"
+                            name="discount_rate"
+                            value="0"
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            class="block min-h-12 w-full rounded-xl border border-slate-600 bg-slate-950 px-4 py-3 text-white focus:border-sky-400 focus:outline-none"
+                            placeholder="Enter discount percentage">
+
+                        <p class="mt-2 text-xs text-slate-400">
+                            The discount is applied to the subtotal before tax.
+                        </p>
+                    </div>
+
+                    <!-- Tax -->
+                    <div>
+                        <label for="tax_rate"
+                               class="mb-2 block font-semibold text-slate-200">
+                            Tax Rate (%)
+                        </label>
+
+                        <input
+                            type="number"
+                            id="tax_rate"
+                            name="tax_rate"
+                            value="0"
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            class="block min-h-12 w-full rounded-xl border border-slate-600 bg-slate-950 px-4 py-3 text-white focus:border-sky-400 focus:outline-none"
+                            placeholder="Enter tax percentage">
+                    </div>
+
+                </div>
+
+                <!-- Calculation Summary -->
+                <div class="rounded-xl border border-slate-700 bg-slate-950 p-5">
+
+                    <h3 class="mb-4 font-bold text-slate-200">
+                        Calculation Summary
+                    </h3>
+
+                    <div class="flex justify-between gap-4 border-b border-slate-800 py-3">
+                        <span class="text-slate-400">Subtotal</span>
+                        <span id="subtotal" class="font-semibold text-white">
+                            ₹0.00
+                        </span>
+                    </div>
+
+                    <div class="flex justify-between gap-4 border-b border-slate-800 py-3">
+                        <span class="text-slate-400">
+                            Discount Amount
+                        </span>
+                        <span id="discount_amount"
+                              class="font-semibold text-amber-400">
+                            - ₹0.00
+                        </span>
+                    </div>
+
+                    <div class="flex justify-between gap-4 border-b border-slate-800 py-3">
+                        <span class="text-slate-400">
+                            Taxable Amount
+                        </span>
+                        <span id="taxable_amount" class="font-semibold text-white">
+                            ₹0.00
+                        </span>
+                    </div>
+
+                    <div class="flex justify-between gap-4 border-b border-slate-800 py-3">
+                        <span class="text-slate-400">Tax Amount</span>
+                        <span id="tax_amount" class="font-semibold text-white">
+                            ₹0.00
+                        </span>
+                    </div>
+
+                    <div class="mt-4 flex justify-between gap-4">
+                        <span class="text-lg font-bold text-white">
+                            Grand Total
+                        </span>
+
+                        <span id="grand_total"
+                              class="text-xl font-bold text-sky-400">
+                            ₹0.00
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Form Buttons -->
+        <div class="flex flex-col-reverse justify-end gap-3 sm:flex-row">
+
+            <a href="{% url 'sales_invoice' %}"
+               class="rounded-xl border border-slate-700 bg-slate-900 px-6 py-3 text-center font-semibold text-white hover:bg-slate-800">
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="rounded-xl bg-sky-500 px-6 py-3 font-bold text-white shadow-lg transition hover:bg-sky-600">
+
+                <i class="fa-solid fa-floppy-disk mr-2"></i>
+                Save Invoice
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+<!-- Template for Additional Product Rows -->
+<template id="productRowTemplate">
+    <div class="product-row rounded-xl border border-slate-700 bg-slate-950 p-4">
+
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12">
+
+            <div class="lg:col-span-5">
+                <label class="mb-2 block text-sm font-medium text-slate-300">
+                    Product <span class="text-red-400">*</span>
+                </label>
+
+                <select
+                    name="product_id"
+                    class="product-select block min-h-12 w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-3 text-white focus:border-sky-400 focus:outline-none"
+                    required>
+
+                    <option value="">Select Product</option>
+
+                    {% for product in products %}
+                        {% if product.status == "Active" %}
+                            <option
+                                value="{{ product.id }}"
+                                data-price="{{ product.unit_price }}">
+                                {{ product.product_code }} - {{ product.product_name }}
+                            </option>
+                        {% endif %}
+                    {% endfor %}
+
+                </select>
+            </div>
+
+            <div class="lg:col-span-2">
+                <label class="mb-2 block text-sm font-medium text-slate-300">
+                    Quantity
+                </label>
+
+                <input
+                    type="number"
+                    name="quantity"
+                    class="quantity-input block min-h-12 w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-3 text-white focus:border-sky-400 focus:outline-none"
+                    min="1"
+                    step="1"
+                    value="1"
+                    required>
+            </div>
+
+            <div class="lg:col-span-2">
+                <label class="mb-2 block text-sm font-medium text-slate-300">
+                    Unit Price (₹)
+                </label>
+
+                <input
+                    type="text"
+                    class="unit-price block min-h-12 w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-3 text-slate-300"
+                    value="0.00"
+                    readonly>
+            </div>
+
+            <div class="lg:col-span-2">
+                <label class="mb-2 block text-sm font-medium text-slate-300">
+                    Line Total (₹)
+                </label>
+
+                <input
+                    type="text"
+                    class="line-total block min-h-12 w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-3 font-semibold text-sky-400"
+                    value="0.00"
+                    readonly>
+            </div>
+
+            <div class="flex items-end lg:col-span-1">
+                <button
+                    type="button"
+                    class="remove-product flex min-h-12 w-full items-center justify-center rounded-xl border border-red-500/30 bg-red-500/10 px-3 text-red-400 hover:bg-red-500/20"
+                    title="Remove product"
+                    aria-label="Remove product">
+
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+
+        </div>
+    </div>
+</template>
+
+<!-- JavaScript Calculations -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const productRows = document.getElementById("productRows");
+    const addProductBtn = document.getElementById("addProductBtn");
+    const productRowTemplate = document.getElementById("productRowTemplate");
+
+    const discountInput = document.getElementById("discount_rate");
+    const taxInput = document.getElementById("tax_rate");
+    const invoiceForm = document.getElementById("invoiceForm");
+
+    function formatCurrency(amount) {
+        return "₹" + amount.toLocaleString("en-IN", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+
+    function getSafePercentage(input) {
+        const value = Number(input.value);
+
+        if (!Number.isFinite(value)) {
+            return 0;
+        }
+
+        return Math.min(100, Math.max(0, value));
+    }
+
+    function updateRow(row) {
+        const select = row.querySelector(".product-select");
+        const quantityInput = row.querySelector(".quantity-input");
+        const priceInput = row.querySelector(".unit-price");
+        const lineTotalInput = row.querySelector(".line-total");
+
+        const selectedOption = select.options[select.selectedIndex];
+
+        const unitPrice = selectedOption
+            ? Number(selectedOption.dataset.price || 0)
+            : 0;
+
+        const quantity = Math.max(0, Number(quantityInput.value) || 0);
+        const lineTotal = unitPrice * quantity;
+
+        priceInput.value = unitPrice.toFixed(2);
+        lineTotalInput.value = lineTotal.toFixed(2);
+
+        return lineTotal;
+    }
+
+    function updateTotals() {
+        let subtotal = 0;
+
+        productRows.querySelectorAll(".product-row").forEach(function (row) {
+            subtotal += updateRow(row);
+        });
+
+        const discountRate = getSafePercentage(discountInput);
+        const taxRate = getSafePercentage(taxInput);
+
+        const discountAmount = subtotal * discountRate / 100;
+        const taxableAmount = Math.max(0, subtotal - discountAmount);
+        const taxAmount = taxableAmount * taxRate / 100;
+        const grandTotal = taxableAmount + taxAmount;
+
+        document.getElementById("subtotal").textContent =
+            formatCurrency(subtotal);
+
+        document.getElementById("discount_amount").textContent =
+            "- " + formatCurrency(discountAmount);
+
+        document.getElementById("taxable_amount").textContent =
+            formatCurrency(taxableAmount);
+
+        document.getElementById("tax_amount").textContent =
+            formatCurrency(taxAmount);
+
+        document.getElementById("grand_total").textContent =
+            formatCurrency(grandTotal);
+    }
+
+    // Add a product row.
+    addProductBtn.addEventListener("click", function () {
+        const fragment = productRowTemplate.content.cloneNode(true);
+        productRows.appendChild(fragment);
+        updateTotals();
+    });
+
+    // Update calculations when a product or quantity changes.
+    productRows.addEventListener("change", function (event) {
+        if (
+            event.target.classList.contains("product-select") ||
+            event.target.classList.contains("quantity-input")
+        ) {
+            updateTotals();
+        }
+    });
+
+    productRows.addEventListener("input", function (event) {
+        if (event.target.classList.contains("quantity-input")) {
+            updateTotals();
+        }
+    });
+
+    // Remove a product row, keeping at least one row.
+    productRows.addEventListener("click", function (event) {
+        const removeButton = event.target.closest(".remove-product");
+
+        if (!removeButton) {
+            return;
+        }
+
+        const rows = productRows.querySelectorAll(".product-row");
+
+        if (rows.length === 1) {
+            const row = rows[0];
+            row.querySelector(".product-select").value = "";
+            row.querySelector(".quantity-input").value = "1";
+        } else {
+            removeButton.closest(".product-row").remove();
+        }
+
+        updateTotals();
+    });
+
+    // Recalculate when the discount or tax percentage changes.
+    discountInput.addEventListener("input", updateTotals);
+    taxInput.addEventListener("input", updateTotals);
+
+    // Validate the invoice before submission.
+    invoiceForm.addEventListener("submit", function (event) {
+        const selectedRows = Array.from(
+            productRows.querySelectorAll(".product-row")
+        );
+
+        const hasProduct = selectedRows.some(function (row) {
+            return row.querySelector(".product-select").value !== "";
+        });
+
+        if (!hasProduct) {
+            event.preventDefault();
+            alert("Please select at least one product.");
+            return;
+        }
+
+        for (const row of selectedRows) {
+            const product = row.querySelector(".product-select").value;
+            const quantity = Number(
+                row.querySelector(".quantity-input").value
+            );
+
+            if (product && (!Number.isInteger(quantity) || quantity < 1)) {
+                event.preventDefault();
+                alert("Please enter a valid whole-number quantity.");
+                return;
+            }
+        }
+
+        const discountRate = Number(discountInput.value);
+        const taxRate = Number(taxInput.value);
+
+        if (
+            !Number.isFinite(discountRate) ||
+            discountRate < 0 ||
+            discountRate > 100 ||
+            !Number.isFinite(taxRate) ||
+            taxRate < 0 ||
+            taxRate > 100
+        ) {
+            event.preventDefault();
+            alert("Discount and tax rates must be between 0 and 100.");
+        }
+    });
+
+    // Apply the dark browser date-picker theme.
+    const dateInput = document.getElementById("invoice_date");
+    dateInput.style.colorScheme = "dark";
+
+    updateTotals();
+});
+</script>
+
+
+<style>
+    input[type="date"] {
+        color-scheme: dark;
+        background-color: #020617;
+        color: #ffffff;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: brightness(0) invert(1);
+        opacity: 1;
+        cursor: pointer;
+        width: 20px;
+        height: 20px;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator:hover {
+        opacity: 10;
+    }
+
+    input:focus,
+    select:focus {
+        outline: none;
+    }
+</style>
+
+
+{% endblock %}

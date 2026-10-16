@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if customer %}Edit Customer{% else %}Add Customer{% endif %} | SalesERP Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-white min-h-screen">
+    <div class="max-w-3xl mx-auto px-6 py-10">
+        <a href="{% url 'customer_master' %}" class="text-sky-400 hover:text-sky-300">
+            &larr; Back to Customer Master
+        </a>
+
+        <div class="mt-6 bg-slate-900 border border-slate-700 rounded-2xl p-8">
+            <h1 class="text-2xl font-bold mb-2">
+                {% if customer %}Edit Customer{% else %}Add New Customer{% endif %}
+            </h1>
+            <p class="text-slate-400 mb-8">Enter the customer information below.</p>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <p class="mb-4 text-rose-400">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" class="space-y-5">
+                {% csrf_token %}
+
+                <div>
+                    <label for="customer_code" class="block mb-2 text-sm">Customer Code *</label>
+                    <input id="customer_code" name="customer_code" required
+                           value="{{ customer.customer_code|default:'' }}"
+                           class="w-full rounded-lg bg-slate-800 border border-slate-600 p-3 text-white">
+                </div>
+
+                <div>
+                    <label for="customer_name" class="block mb-2 text-sm">Customer Name *</label>
+                    <input id="customer_name" name="customer_name" required
+                           value="{{ customer.customer_name|default:'' }}"
+                           class="w-full rounded-lg bg-slate-800 border border-slate-600 p-3 text-white">
+                </div>
+
+                <div>
+                    <label for="tax_id" class="block mb-2 text-sm">Tax ID</label>
+                    <input id="tax_id" name="tax_id"
+                           value="{{ customer.tax_id|default:'' }}"
+                           class="w-full rounded-lg bg-slate-800 border border-slate-600 p-3 text-white">
+                </div>
+
+                <div>
+                    <label for="email" class="block mb-2 text-sm">Email</label>
+                    <input id="email" name="email" type="email"
+                           value="{{ customer.email|default:'' }}"
+                           class="w-full rounded-lg bg-slate-800 border border-slate-600 p-3 text-white">
+                </div>
+
+                <div>
+                    <label for="credit_limit" class="block mb-2 text-sm">Credit Limit</label>
+                    <input id="credit_limit" name="credit_limit" type="number"
+                           min="0" step="0.01"
+                           value="{{ customer.credit_limit|default:'0.00' }}"
+                           class="w-full rounded-lg bg-slate-800 border border-slate-600 p-3 text-white">
+                </div>
+
+                <div>
+                    <label for="status" class="block mb-2 text-sm">Status</label>
+                    <select id="status" name="status"
+                            class="w-full rounded-lg bg-slate-800 border border-slate-600 p-3 text-white">
+                        <option value="Active" {% if customer.status == 'Active' %}selected{% endif %}>Active</option>
+                        <option value="Inactive" {% if customer.status == 'Inactive' %}selected{% endif %}>Inactive</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="submit"
+                            class="rounded-lg bg-sky-500 hover:bg-sky-400 px-6 py-3 font-semibold text-slate-950">
+                        {% if customer %}Save Changes{% else %}Add Customer{% endif %}
+                    </button>
+                    <a href="{% url 'customer_master' %}"
+                       class="rounded-lg bg-slate-700 hover:bg-slate-600 px-6 py-3">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

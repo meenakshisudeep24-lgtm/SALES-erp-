@@ -1,0 +1,455 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard | SalesERP Pro{% endblock %}
+
+{% block content %}
+
+<div class="space-y-8">
+
+    <!-- PAGE HEADER -->
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <p class="text-sm font-medium text-sky-400">
+                SALESERP PRO / OVERVIEW
+            </p>
+            <h1 class="mt-2 text-3xl font-bold tracking-tight text-white">
+                Dashboard
+            </h1>
+            <p class="mt-2 text-sm text-slate-400">
+                Monitor your sales, customers, products and invoices.
+            </p>
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+            <a href="{% url 'customer_create' %}"
+               class="inline-flex items-center gap-2 rounded-xl bg-sky-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-sky-400">
+                <i class="fa-solid fa-user-plus"></i>
+                Add Customer
+            </a>
+
+            <a href="{% url 'sales_invoice_create' %}"
+               class="inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm font-semibold text-slate-200 transition hover:border-sky-500">
+                <i class="fa-solid fa-file-invoice"></i>
+                New Invoice
+            </a>
+        </div>
+    </div>
+
+
+    <!-- DJANGO MESSAGES -->
+    {% if messages %}
+        <div class="space-y-3">
+            {% for message in messages %}
+                <div class="rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+
+    <!-- STATISTICS CARDS -->
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+
+        <!-- CUSTOMERS -->
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-slate-400">Total Customers</p>
+                    <h2 class="mt-3 text-3xl font-bold text-white">
+                        {{ total_customers|default:0 }}
+                    </h2>
+                </div>
+
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-sky-500/15 text-sky-400">
+                    <i class="fa-solid fa-users text-xl"></i>
+                </div>
+            </div>
+
+            <a href="{% url 'customer_master' %}"
+               class="mt-5 inline-flex items-center gap-2 text-sm font-medium text-sky-400 hover:text-sky-300">
+                View customers
+                <i class="fa-solid fa-arrow-right text-xs"></i>
+            </a>
+        </div>
+
+
+        <!-- PRODUCTS -->
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-slate-400">Total Products</p>
+                    <h2 class="mt-3 text-3xl font-bold text-white">
+                        {{ total_products|default:0 }}
+                    </h2>
+                </div>
+
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-violet-500/15 text-violet-400">
+                    <i class="fa-solid fa-box text-xl"></i>
+                </div>
+            </div>
+
+            <a href="{% url 'product_master' %}"
+               class="mt-5 inline-flex items-center gap-2 text-sm font-medium text-violet-400 hover:text-violet-300">
+                View products
+                <i class="fa-solid fa-arrow-right text-xs"></i>
+            </a>
+        </div>
+
+
+        <!-- INVOICES -->
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-slate-400">Total Invoices</p>
+                    <h2 class="mt-3 text-3xl font-bold text-white">
+                        {{ total_invoices|default:0 }}
+                    </h2>
+                </div>
+
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400">
+                    <i class="fa-solid fa-file-invoice-dollar text-xl"></i>
+                </div>
+            </div>
+
+            <a href="{% url 'sales_invoice' %}"
+               class="mt-5 inline-flex items-center gap-2 text-sm font-medium text-amber-400 hover:text-amber-300">
+                View invoices
+                <i class="fa-solid fa-arrow-right text-xs"></i>
+            </a>
+        </div>
+
+
+        <!-- TOTAL SALES -->
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-slate-400">Total Invoice Sales</p>
+                    <h2 class="mt-3 break-words text-2xl font-bold text-white">
+                        ₹{{ total_sales|default:0|floatformat:2 }}
+                    </h2>
+                </div>
+
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400">
+                    <i class="fa-solid fa-indian-rupee-sign text-xl"></i>
+                </div>
+            </div>
+
+            <p class="mt-5 text-sm text-slate-500">
+                Based on saved sales invoices
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- ONE-YEAR SALES GRAPH -->
+    <section class="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/80 shadow-lg">
+
+        <div class="flex flex-col gap-3 border-b border-slate-800 p-6 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h2 class="text-xl font-bold text-white">
+                    One-Year Sales Analysis
+                </h2>
+                <p class="mt-2 text-sm text-slate-400">
+                    Monthly sales totals calculated from your CSV dataset.
+                </p>
+            </div>
+
+            <div class="inline-flex w-fit items-center gap-2 rounded-full border border-sky-500/20 bg-sky-500/10 px-3 py-2 text-sm text-sky-300">
+                <i class="fa-solid fa-chart-line"></i>
+                Latest 12 months
+            </div>
+        </div>
+
+        <div class="p-4 sm:p-6">
+            {% if sales_labels %}
+                <div class="relative h-72 w-full sm:h-96">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            {% else %}
+                <div class="rounded-xl border border-dashed border-slate-700 p-10 text-center">
+                    <i class="fa-solid fa-chart-column text-3xl text-slate-500"></i>
+
+                    <h3 class="mt-4 font-semibold text-white">
+                        No sales data available
+                    </h3>
+
+                    <p class="mt-2 text-sm text-slate-400">
+                        Check that sales_data.csv exists in the sales_app
+                        folder and contains valid Date and Sales columns.
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+
+    <!-- RECENT INVOICES -->
+    <section class="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/80 shadow-lg">
+
+        <div class="flex flex-col gap-3 border-b border-slate-800 p-6 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h2 class="text-xl font-bold text-white">
+                    Recent Sales Invoices
+                </h2>
+                <p class="mt-2 text-sm text-slate-400">
+                    The latest invoices saved in your database.
+                </p>
+            </div>
+
+            <a href="{% url 'sales_invoice' %}"
+               class="text-sm font-semibold text-sky-400 hover:text-sky-300">
+                View all invoices
+                <i class="fa-solid fa-arrow-right ml-1"></i>
+            </a>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full min-w-[650px] text-left text-sm">
+
+                <thead class="bg-slate-950/60 text-xs uppercase tracking-wider text-slate-400">
+                    <tr>
+                        <th class="px-6 py-4">Invoice Number</th>
+                        <th class="px-6 py-4">Customer</th>
+                        <th class="px-6 py-4">Date</th>
+                        <th class="px-6 py-4">Status</th>
+                        <th class="px-6 py-4 text-right">Total</th>
+                        <th class="px-6 py-4 text-right">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody class="divide-y divide-slate-800">
+
+                    {% for invoice in recent_invoices %}
+                        <tr class="transition hover:bg-slate-800/40">
+
+                            <td class="px-6 py-4 font-semibold text-sky-300">
+                                {{ invoice.invoice_number|default:"Pending" }}
+                            </td>
+
+                            <td class="px-6 py-4 text-slate-200">
+                                {{ invoice.customer.customer_name }}
+                            </td>
+
+                            <td class="px-6 py-4 text-slate-400">
+                                {{ invoice.invoice_date|date:"d M Y" }}
+                            </td>
+
+                            <td class="px-6 py-4">
+                                {% if invoice.status == "Paid" %}
+                                    <span class="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400">
+                                        {{ invoice.status }}
+                                    </span>
+                                {% elif invoice.status == "Cancelled" %}
+                                    <span class="rounded-full bg-rose-500/10 px-3 py-1 text-xs font-medium text-rose-400">
+                                        {{ invoice.status }}
+                                    </span>
+                                {% else %}
+                                    <span class="rounded-full bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-400">
+                                        {{ invoice.status|default:"Draft" }}
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td class="px-6 py-4 text-right font-medium text-white">
+                                ₹{{ invoice.grand_total|floatformat:2 }}
+                            </td>
+
+                            <td class="px-6 py-4 text-right">
+                                <a href="{% url 'sales_invoice_detail' invoice.id %}"
+                                   class="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-xs font-medium text-slate-300 hover:border-sky-500 hover:text-sky-300">
+                                    View
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                </a>
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="px-6 py-12 text-center">
+                                <i class="fa-solid fa-file-invoice text-3xl text-slate-600"></i>
+
+                                <p class="mt-4 font-medium text-slate-300">
+                                    No invoices yet
+                                </p>
+
+                                <p class="mt-2 text-sm text-slate-500">
+                                    Create your first invoice to see it here.
+                                </p>
+
+                                <a href="{% url 'sales_invoice_create' %}"
+                                   class="mt-4 inline-flex items-center gap-2 rounded-lg bg-sky-500 px-4 py-2 font-semibold text-white hover:bg-sky-400">
+                                    <i class="fa-solid fa-plus"></i>
+                                    Create invoice
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+
+    <!-- QUICK ACCESS -->
+    <section>
+        <div class="mb-4">
+            <h2 class="text-xl font-bold text-white">Quick Access</h2>
+            <p class="mt-2 text-sm text-slate-400">
+                Open the main sections of SalesERP Pro.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+
+            <a href="{% url 'customer_master' %}"
+               class="group rounded-2xl border border-slate-800 bg-slate-900/70 p-5 transition hover:border-sky-500/50 hover:bg-slate-900">
+                <i class="fa-solid fa-users text-xl text-sky-400"></i>
+                <h3 class="mt-4 font-semibold text-white">Customer Master</h3>
+                <p class="mt-2 text-sm text-slate-400">
+                    Manage customer records and contact information.
+                </p>
+            </a>
+
+            <a href="{% url 'product_master' %}"
+               class="group rounded-2xl border border-slate-800 bg-slate-900/70 p-5 transition hover:border-violet-500/50 hover:bg-slate-900">
+                <i class="fa-solid fa-box text-xl text-violet-400"></i>
+                <h3 class="mt-4 font-semibold text-white">Product Master</h3>
+                <p class="mt-2 text-sm text-slate-400">
+                    View and manage your product catalogue.
+                </p>
+            </a>
+
+            <a href="{% url 'sales_invoice' %}"
+               class="group rounded-2xl border border-slate-800 bg-slate-900/70 p-5 transition hover:border-emerald-500/50 hover:bg-slate-900">
+                <i class="fa-solid fa-file-invoice-dollar text-xl text-emerald-400"></i>
+                <h3 class="mt-4 font-semibold text-white">Sales Invoices</h3>
+                <p class="mt-2 text-sm text-slate-400">
+                    Review invoices and their recorded totals.
+                </p>
+            </a>
+
+        </div>
+    </section>
+
+</div>
+
+
+<!-- CHART.JS -->
+{% if sales_labels %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const salesLabels = {{ sales_labels|safe }};
+        const salesValues = {{ sales_values|safe }};
+
+        const canvas = document.getElementById("salesChart");
+
+        if (!canvas || typeof Chart === "undefined") {
+            return;
+        }
+
+        new Chart(canvas, {
+            type: "line",
+
+            data: {
+                labels: salesLabels,
+
+                datasets: [{
+                    label: "Monthly Sales (₹)",
+                    data: salesValues,
+
+                    borderColor: "#38bdf8",
+                    backgroundColor: "rgba(56, 189, 248, 0.12)",
+
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.3,
+
+                    pointRadius: 4,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: "#7dd3fc",
+                    pointBorderColor: "#0f172a",
+                    pointBorderWidth: 2
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                interaction: {
+                    intersect: false,
+                    mode: "index"
+                },
+
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: {
+                            color: "#cbd5e1",
+                            usePointStyle: true,
+                            padding: 20
+                        }
+                    },
+
+                    tooltip: {
+                        backgroundColor: "#020617",
+                        titleColor: "#f8fafc",
+                        bodyColor: "#e2e8f0",
+
+                        callbacks: {
+                            label: function(context) {
+                                const value = Number(context.parsed.y);
+
+                                return "Sales: ₹" +
+                                    value.toLocaleString("en-IN", {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    });
+                            }
+                        }
+                    }
+                },
+
+                scales: {
+                    x: {
+                        ticks: {
+                            color: "#94a3b8"
+                        },
+
+                        grid: {
+                            color: "rgba(148, 163, 184, 0.08)"
+                        }
+                    },
+
+                    y: {
+                        beginAtZero: true,
+
+                        ticks: {
+                            color: "#94a3b8",
+
+                            callback: function(value) {
+                                return "₹" +
+                                    Number(value).toLocaleString("en-IN");
+                            }
+                        },
+
+                        grid: {
+                            color: "rgba(148, 163, 184, 0.10)"
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endif %}
+
+{% endblock %}

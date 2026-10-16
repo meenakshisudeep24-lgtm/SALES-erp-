@@ -1,0 +1,247 @@
+<!-- templates/product_new.html -->
+{% extends 'base.html' %}
+
+{% block title %}Add New Product | SalesERP{% endblock %}
+{% block page_title %}New Product Registration{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+
+    <!-- Breadcrumb & Back Navigation -->
+    <div class="flex items-center justify-between">
+        <a href="{% url 'product_master' %}" class="inline-flex items-center gap-2 text-xs font-semibold text-zinc-400 hover:text-emerald-400 transition">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Back to Product Master</span>
+        </a>
+        <span class="text-xs text-zinc-500 font-mono">DEDICATED FULL-PAGE FORM (NO POPUP)</span>
+    </div>
+
+    <!-- Main Card Container in Obsidian Black -->
+    <div class="bg-zinc-950 rounded-2xl border border-zinc-800 shadow-2xl overflow-hidden">
+        
+        <!-- Header Banner -->
+        <div class="px-6 py-5 bg-gradient-to-r from-zinc-900 to-black border-b border-zinc-800 text-white flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-base shadow-md">
+                    <i class="fa-solid fa-box-open"></i>
+                </div>
+                <div>
+                    <h2 class="font-bold text-base text-white">Register New Catalog SKU / Product</h2>
+                    <p class="text-xs text-zinc-400">Define specifications, wholesale pricing, margin targets, and inventory thresholds</p>
+                </div>
+            </div>
+            <span class="hidden md:inline-flex px-3 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                Full Page Form
+            </span>
+        </div>
+
+        <!-- Product Form -->
+        <form id="newProductForm" method="POST" action="{% url 'product_create' %}" class="p-6 md:p-8 space-y-8 text-xs">
+            {% csrf_token %}
+
+            <!-- Section 1: Item Identification -->
+            <div class="space-y-4">
+                <div class="flex items-center gap-2 pb-2 border-b border-zinc-800">
+                    <i class="fa-solid fa-barcode text-emerald-400"></i>
+                    <h3 class="font-bold uppercase tracking-wider text-zinc-300 text-xs">Product Core Identification</h3>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div>
+                        <label class="block font-semibold text-zinc-300 mb-1.5">
+                            SKU Identifier <span class="text-rose-400">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="productSku"
+                            name="sku" 
+                            required 
+                            value="SKU-008" 
+                            class="w-full px-3.5 py-2.5 bg-zinc-900/60 border border-zinc-800 rounded-xl font-mono text-emerald-400 font-bold focus:outline-none">
+                        <span class="text-[10px] text-zinc-500 mt-1 block">Unique stock keeping unit code</span>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block font-semibold text-zinc-300 mb-1.5">
+                            Item Title / Name <span class="text-rose-400">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="productName"
+                            name="name" 
+                            required 
+                            placeholder="e.g. Apex High-Precision Optical Encoder 4096-PPR" 
+                            class="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-700/80 rounded-xl text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-emerald-500 transition">
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-zinc-300 mb-1.5">Category</label>
+                        <select 
+                            id="productCategory"
+                            name="category" 
+                            class="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-700/80 rounded-xl text-zinc-100 focus:outline-none focus:border-emerald-500">
+                            <option value="Hardware">Hardware / Actuators</option>
+                            <option value="Sensors">Sensors & Telemetry</option>
+                            <option value="Electronics">Electronics & Controllers</option>
+                            <option value="Industrial">Industrial Motor Inverters</option>
+                            <option value="Robotics">Robotics & End-Effectors</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-zinc-300 mb-1.5">Barcode / UPC</label>
+                        <input 
+                            type="text" 
+                            id="productBarcode"
+                            name="barcode" 
+                            value="840192837408" 
+                            class="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-700/80 rounded-xl font-mono text-zinc-100 focus:outline-none focus:border-emerald-500 transition">
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-zinc-300 mb-1.5">Unit of Measure</label>
+                        <select 
+                            id="productUom"
+                            name="uom" 
+                            class="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-700/80 rounded-xl text-zinc-100 focus:outline-none focus:border-emerald-500">
+                            <option value="PCS">PCS (Pieces)</option>
+                            <option value="SET">SET (Assemblies)</option>
+                            <option value="UNIT">UNIT</option>
+                            <option value="BOX">BOX</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Economics & Pricing -->
+            <div class="space-y-4">
+                <div class="flex items-center gap-2 pb-2 border-b border-zinc-800">
+                    <i class="fa-solid fa-dollar-sign text-sky-400"></i>
+                    <h3 class="font-bold uppercase tracking-wider text-zinc-300 text-xs">Pricing & Cost Economics</h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+                    <div>
+                        <label class="block font-semibold text-zinc-300 mb-1.5">Cost Price ($)</label>
+                        <input 
+                            type="number" 
+                            step="0.01"
+                            id="costPrice"
+                            name="cost_price" 
+                            value="220.00" 
+                            class="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-700/80 rounded-xl font-mono text-zinc-100 focus:outline-none focus:border-emerald-500 transition">
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-zinc-300 mb-1.5">
+                            Selling Price ($) <span class="text-rose-400">*</span>
+                        </label>
+                        <input 
+                            type="number" 
+                            step="0.01"
+                            id="sellingPrice"
+                            name="selling_price" 
+                            required 
+                            value="450.00" 
+                            class="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-700/80 rounded-xl font-mono font-bold text-white focus:outline-none focus:border-emerald-500 transition">
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-zinc-300 mb-1.5">Tax Rate (%)</label>
+                        <select 
+                            id="taxRate"
+                            name="tax_rate" 
+                            class="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-700/80 rounded-xl font-mono text-zinc-100 focus:outline-none focus:border-emerald-500">
+                            <option value="8.5">8.5% (Standard Regional)</option>
+                            <option value="5.0">5.0% (Reduced Rate)</option>
+                            <option value="0.0">0.0% (Zero Rated / Export)</option>
+                            <option value="18.0">18.0% (High Value GST)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-zinc-300 mb-1.5">Primary Supplier</label>
+                        <input 
+                            type="text" 
+                            id="supplierName"
+                            name="supplier" 
+                            placeholder="e.g. Nippon Precision Ltd" 
+                            class="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-700/80 rounded-xl text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-emerald-500 transition">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Stock Levels -->
+            <div class="space-y-4">
+                <div class="flex items-center gap-2 pb-2 border-b border-zinc-800">
+                    <i class="fa-solid fa-boxes-stacked text-purple-400"></i>
+                    <h3 class="font-bold uppercase tracking-wider text-zinc-300 text-xs">Inventory Buffer Controls</h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block font-semibold text-zinc-300 mb-1.5">Initial In-Stock Qty</label>
+                        <input 
+                            type="number" 
+                            id="stockQty"
+                            name="stock_qty" 
+                            value="40" 
+                            class="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-700/80 rounded-xl font-mono text-zinc-100 focus:outline-none focus:border-emerald-500 transition">
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-zinc-300 mb-1.5">Reorder Safety Level</label>
+                        <input 
+                            type="number" 
+                            id="reorderLevel"
+                            name="reorder_level" 
+                            value="12" 
+                            class="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-700/80 rounded-xl font-mono text-zinc-100 focus:outline-none focus:border-emerald-500 transition">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="pt-6 border-t border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <span class="text-zinc-500 text-[11px] flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                    <span>This form registers the item directly into the Product Master without popups</span>
+                </span>
+
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <a href="{% url 'product_master' %}" class="w-1/2 sm:w-auto px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-semibold rounded-xl border border-zinc-800 transition text-center">
+                        Cancel
+                    </a>
+                    <button 
+                        type="submit" 
+                        class="w-1/2 sm:w-auto px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded-xl shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Save to Product Master</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('newProductForm').addEventListener('submit', function(e) {
+        const sku = document.getElementById('productSku').value;
+        const name = document.getElementById('productName').value;
+        const category = document.getElementById('productCategory').value;
+        const barcode = document.getElementById('productBarcode').value;
+        const uom = document.getElementById('productUom').value;
+        const costPrice = document.getElementById('costPrice').value;
+        const sellingPrice = document.getElementById('sellingPrice').value;
+        const stockQty = document.getElementById('stockQty').value;
+        const supplier = document.getElementById('supplierName').value || 'Standard Verified Vendor';
+
+        // Save to browser localStorage as persistence backup
+        const stored = JSON.parse(localStorage.getItem('saleserp_custom_products') || '[]');
+        stored.push({ sku, name, category, barcode, uom, costPrice, sellingPrice, stockQty, supplier });
+        localStorage.setItem('saleserp_custom_products', JSON.stringify(stored));
+    });
+</script>
+{% endblock %}
